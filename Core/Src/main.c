@@ -86,7 +86,7 @@ static void MX_DMA_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
-extern uint32_t os_time;
+//extern uint32_t os_time;
 
 //uint32_t HAL_GetTick(void) {
 //    return os_time;
@@ -122,60 +122,83 @@ int _write(int file, char *ptr, int len)//Clion”√(setvbufΩ˚”√ª∫≥Â)
 //    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 10);
 //    return ch;
 //}
+void LEDShow_Thread(void const *arg);
+osThreadDef (LEDShow_Thread, osPriorityNormal, 1, 0);
+osThreadId tid_led_show_thread;
+
+void UART1_Send_Thread(void const *arg);
+osThreadDef (UART1_Send_Thread, osPriorityNormal, 1, 0);
+osThreadId tid_uart_send_thread;
+
+osMessageQDef(msgq_LEDShow_Thread,3,uint32_t);
+osMessageQId (msgq_LEDShow_Thread_id);
+
+osMessageQDef(msgq_UART1_Send_Thread,3,uint32_t);
+osMessageQId (msgq_UART1_Send_Thread_id);
 
 void LEDShow_Thread(void const *arg) {
     osEvent wairtresult;
     while(1){
-        wairtresult= osSignalWait(0x0001,osWaitForever);
-        if(wairtresult.status==osEventSignal){
-            HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_RESET);
-            osDelay(1000);
-            HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET);
-//            osDelay(1000);
+        wairtresult = osMessageGet(msgq_LEDShow_Thread_id,osWaitForever);
+        if(wairtresult.status==osEventMessage){
+            if(wairtresult.value.v==0x01){
+                HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_RESET);
+                osDelay(1000);
+                HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET);
+            }else if(wairtresult.value.v==0x02){
+                HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_RESET);
+                osDelay(200);
+                HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET);
+            }
         }
-//        HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
-//        osDelay(600);
+//        wairtresult= osSignalWait(0x0001,osWaitForever);
+//        if(wairtresult.status==osEventSignal){
+//            HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_RESET);
+//            osDelay(1000);
+//            HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET);
+////            osDelay(1000);
+//        }
     }
 }
 void UART1_Send_Thread(void const *arg) {
     osEvent wairtresult;
     uint8_t i;
-    char sendc;
+    char sendcA='A';
+    char sendcB='B';
     while(1){
-        wairtresult = osSignalWait(0x0001,osWaitForever);
-        if(wairtresult.status==osEventSignal) {
-            sendc = 'A';
-            for (i = 0; i < 10; i++) {
-//                printf("%c",sendc);
-                HAL_UART_Transmit(&huart1, (uint8_t *) &sendc, 1, 100);
-                sendc++;
-                osDelay(311);
+        wairtresult = osMessageGet(msgq_UART1_Send_Thread_id,osWaitForever);
+        if(wairtresult.status==osEventMessage){
+            if(wairtresult.value.v==0x01){
+                HAL_UART_Transmit(&huart1, (uint8_t *)&sendcA, 1, 100);
+            }else if(wairtresult.value.v==0x02){
+                HAL_UART_Transmit(&huart1, (uint8_t *)&sendcB, 1, 100);
             }
         }
-//        sendc ='A';
-//        for(i=0;i<10;i++){
+//        wairtresult = osSignalWait(0x0001,osWaitForever);
+//        if(wairtresult.status==osEventSignal) {
+//            sendc = 'A';
+//            for (i = 0; i < 10; i++) {
 ////                printf("%c",sendc);
-//            HAL_UART_Transmit(&huart1, (uint8_t*)&sendc, 1, 100);
-//            sendc++;
-//            osDelay(311);
+//                HAL_UART_Transmit(&huart1, (uint8_t *) &sendc, 1, 100);
+//                sendc++;
+//                osDelay(311);
+//            }
 //        }
     }
 }
-
-osThreadDef (LEDShow_Thread, osPriorityNormal, 1, 0);
-osThreadId tid_led_show_thread;
-
-osThreadDef (UART1_Send_Thread, osPriorityNormal, 1, 0);
-osThreadId tid_uart_send_thread;
 
 volatile uint8_t key1_is_pressed = 0;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if (GPIO_Pin == KEY1_Pin) {
 //        key1_is_pressed = 1;
 //        HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
-        osSignalSet(tid_led_show_thread, 0x00000001);
-        osSignalSet(tid_uart_send_thread, 0x00000001);
-
+//        osSignalSet(tid_led_show_thread, 0x00000001);
+//        osSignalSet(tid_uart_send_thread, 0x00000001);
+        osMessagePut(msgq_LEDShow_Thread_id,0x01,0);
+        osMessagePut(msgq_UART1_Send_Thread_id,0x01,0);
+    }else if (GPIO_Pin == KEY2_Pin){
+        osMessagePut(msgq_LEDShow_Thread_id,0x02,0);
+        osMessagePut(msgq_UART1_Send_Thread_id,0x02,0);
     }
 }
 /* USER CODE END 0 */
@@ -230,6 +253,10 @@ int main(void)
     elog_start();
     log_i("Wireless test start");
     HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET);
+
+    msgq_LEDShow_Thread_id= osMessageCreate(osMessageQ(msgq_LEDShow_Thread),NULL);
+    msgq_UART1_Send_Thread_id= osMessageCreate(osMessageQ(msgq_UART1_Send_Thread),NULL);
+
     if (tid_led_show_thread==NULL){
         log_e("LED_ERROR");
     }else{
