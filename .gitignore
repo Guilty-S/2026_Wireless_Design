@@ -1,0 +1,23 @@
+# CLion 和编译产生文件夹
+cmake-build-*/
+.idea/
+.cmake/
+CMakeFiles/
+
+# STM32 编译输出
+Debug/
+Release/
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.o
+*.obj
+*.d
+*.su
+*.cyclo
+
+# 操作系统临时文件
+.DS_Store
+Thumbs.db
