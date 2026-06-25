@@ -132,6 +132,11 @@ osMailQId(htsensorvalue_led_q_id);
 osMutexDef (uart_mutex);
 osMutexId (uart_mutex_id);
 
+void collect_temphumi_timer_callback(void const *arg);
+
+osTimerDef(collect_temphumi_timer, collect_temphumi_timer_callback);
+osTimerId collect_temphumi_timer_id;
+
 void LEDShow_Thread(void const *arg) {
     osEvent wairtresult;
     htsensorvalue_t *temphumi;
@@ -182,12 +187,12 @@ void UART1_Send_Thread(void const *arg) {
             temphumi = (htsensorvalue_t *) wairtresult.value.p;
 //            printf("Temp:%d;Humi:%d\r\n",temphumi->temp,temphumi->humi);
             char buf[32];
-            snprintf(buf,sizeof(buf),
+            snprintf(buf, sizeof(buf),
                      "Temp:%d;Humi:%d\r\n",
                      temphumi->temp,
                      temphumi->humi);
             HAL_UART_Transmit(&huart1,
-                              (uint8_t*)buf,
+                              (uint8_t *) buf,
                               strlen(buf),
                               HAL_MAX_DELAY);
             osMailFree(htsensorvalue_uart1_q_id, temphumi);
@@ -199,30 +204,35 @@ void TempHumi_Collect_Thread(void const *arg) {
     uint32_t begintime;
     uint8_t temp, humi;
     htsensorvalue_t *temphumi;
+    //Clion必须在main函数外，osKernelStart()后osTimerStart，因为无keil5自动优化
+    if (collect_temphumi_timer_id != NULL) {
+        osTimerStart(collect_temphumi_timer_id, 1000);
+    }
     while (1) {
-        log_i("TempHumi_Collect_Thread");
-        begintime = os_time;
-        if (DHT11_Read_Data(&temp, &humi) == 0) {
-            temphumi = (htsensorvalue_t *) osMailAlloc(htsensorvalue_uart1_q_id, osWaitForever);
-            temphumi->temp = temp;
-            temphumi->humi = humi;
-            osMailPut(htsensorvalue_uart1_q_id, temphumi);
-
-            temphumi = (htsensorvalue_t *) osMailAlloc(htsensorvalue_led_q_id, osWaitForever);
-            temphumi->temp = temp;
-            temphumi->humi = humi;
-            osMailPut(htsensorvalue_led_q_id, temphumi);
-        }else{
-            HAL_UART_Transmit(&huart1, (uint8_t*)"Error", 6, 100);
-        }
-        uint32_t cost = os_time - begintime;
-//        printf("cost=%lu\r\n", cost);
-        if(cost < 1000){
-            osDelay(1000 - cost);
-        }else{
-            printf("OVERTIME\r\n");
-            osDelay(1);
-        }
+        osDelay(100);
+//        log_i("TempHumi_Collect_Thread");
+//        begintime = os_time;
+//        if (DHT11_Read_Data(&temp, &humi) == 0) {
+//            temphumi = (htsensorvalue_t *) osMailAlloc(htsensorvalue_uart1_q_id, osWaitForever);
+//            temphumi->temp = temp;
+//            temphumi->humi = humi;
+//            osMailPut(htsensorvalue_uart1_q_id, temphumi);
+//
+//            temphumi = (htsensorvalue_t *) osMailAlloc(htsensorvalue_led_q_id, osWaitForever);
+//            temphumi->temp = temp;
+//            temphumi->humi = humi;
+//            osMailPut(htsensorvalue_led_q_id, temphumi);
+//        } else {
+//            HAL_UART_Transmit(&huart1, (uint8_t *) "Error", 6, 100);
+//        }
+//        uint32_t cost = os_time - begintime;
+////        printf("cost=%lu\r\n", cost);
+//        if (cost < 1000) {
+//            osDelay(1000 - cost);
+//        } else {
+//            printf("OVERTIME\r\n");
+//            osDelay(1);
+//        }
     }
 }
 
@@ -241,6 +251,25 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         osMessagePut(msgq_UART1_Send_Thread_id, 0x02, 0);
     }
 }
+
+void collect_temphumi_timer_callback(void const *arg) {
+    uint8_t temp, humi;
+    htsensorvalue_t *temphumi;
+    if (DHT11_Read_Data(&temp, &humi) == 0) {
+        temphumi = (htsensorvalue_t *) osMailAlloc(htsensorvalue_uart1_q_id, osWaitForever);
+        temphumi->temp = temp;
+        temphumi->humi = humi;
+        osMailPut(htsensorvalue_uart1_q_id, temphumi);
+
+        temphumi = (htsensorvalue_t *) osMailAlloc(htsensorvalue_led_q_id, osWaitForever);
+        temphumi->temp = temp;
+        temphumi->humi = humi;
+        osMailPut(htsensorvalue_led_q_id, temphumi);
+    } else {
+        log_e("DHT11出错了!");
+    }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -290,7 +319,7 @@ int main(void) {
 
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 
-    uart_mutex_id= osMutexCreate(osMutex(uart_mutex));
+    uart_mutex_id = osMutexCreate(osMutex(uart_mutex));
 
     msgq_LEDShow_Thread_id = osMessageCreate(osMessageQ(msgq_LEDShow_Thread), NULL);
     msgq_UART1_Send_Thread_id = osMessageCreate(osMessageQ(msgq_UART1_Send_Thread), NULL);
@@ -301,6 +330,8 @@ int main(void) {
     tid_led_show_thread = osThreadCreate(osThread (LEDShow_Thread), NULL);
     tid_uart_send_thread = osThreadCreate(osThread (UART1_Send_Thread), NULL);
     tid_temphumi_collect_thread = osThreadCreate(osThread(TempHumi_Collect_Thread), NULL);
+
+    collect_temphumi_timer_id = osTimerCreate(osTimer(collect_temphumi_timer), osTimerPeriodic, NULL);
 
     if (tid_led_show_thread == NULL) {
         log_e("LED_ERROR");
