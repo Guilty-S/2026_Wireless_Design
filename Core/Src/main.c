@@ -129,6 +129,9 @@ osMailQId(htsensorvalue_uart1_q_id);
 osMailQDef(htsensorvalue_led_q, 10, htsensorvalue_t);
 osMailQId(htsensorvalue_led_q_id);
 
+osMutexDef (uart_mutex);
+osMutexId (uart_mutex_id);
+
 void LEDShow_Thread(void const *arg) {
     osEvent wairtresult;
     htsensorvalue_t *temphumi;
@@ -169,8 +172,13 @@ void UART1_Send_Thread(void const *arg) {
     htsensorvalue_t *temphumi;
     uint8_t i;
     while (1) {
+//        osDelay(100);
+//        log_i("UART1_Send_Thread");
         wairtresult = osMailGet(htsensorvalue_uart1_q_id, osWaitForever);
         if (wairtresult.status == osEventMail) {
+//            osMutexWait(uart_mutex_id,osWaitForever);
+            log_i("UART1_Send_Thread");
+//            osMutexRelease(uart_mutex_id);
             temphumi = (htsensorvalue_t *) wairtresult.value.p;
 //            printf("Temp:%d;Humi:%d\r\n",temphumi->temp,temphumi->humi);
             char buf[32];
@@ -178,7 +186,6 @@ void UART1_Send_Thread(void const *arg) {
                      "Temp:%d;Humi:%d\r\n",
                      temphumi->temp,
                      temphumi->humi);
-
             HAL_UART_Transmit(&huart1,
                               (uint8_t*)buf,
                               strlen(buf),
@@ -193,8 +200,7 @@ void TempHumi_Collect_Thread(void const *arg) {
     uint8_t temp, humi;
     htsensorvalue_t *temphumi;
     while (1) {
-//        HAL_UART_Transmit(&huart1, (uint8_t *) "Reading", 8, 100);
-//        osDelay(300);
+        log_i("TempHumi_Collect_Thread");
         begintime = os_time;
         if (DHT11_Read_Data(&temp, &humi) == 0) {
             temphumi = (htsensorvalue_t *) osMailAlloc(htsensorvalue_uart1_q_id, osWaitForever);
@@ -283,6 +289,9 @@ int main(void) {
     log_i("Wireless test start");
 
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+
+    uart_mutex_id= osMutexCreate(osMutex(uart_mutex));
+
     msgq_LEDShow_Thread_id = osMessageCreate(osMessageQ(msgq_LEDShow_Thread), NULL);
     msgq_UART1_Send_Thread_id = osMessageCreate(osMessageQ(msgq_UART1_Send_Thread), NULL);
 

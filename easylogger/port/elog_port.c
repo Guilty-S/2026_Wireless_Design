@@ -25,11 +25,15 @@
  * Function: Portable interface for each platform.
  * Created on: 2015-04-28
  */
- 
+
 #include <elog.h>
 #include <stdio.h>
 #include "stm32f1xx_hal.h"
+#include "cmsis_os.h"
+
 extern UART_HandleTypeDef huart1;
+extern osMutexId uart_mutex_id;
+
 /**
  * EasyLogger port initialize
  *
@@ -39,7 +43,7 @@ ElogErrCode elog_port_init(void) {
     ElogErrCode result = ELOG_NO_ERR;
 
     /* add your code here */
-    
+
     return result;
 }
 
@@ -60,28 +64,41 @@ void elog_port_deinit(void) {
  * @param size log size
  */
 void elog_port_output(const char *log, size_t size) {
-    
+
     /* add your code here */
 //     printf("%.*s", size, log);
-    HAL_UART_Transmit(&huart1, (uint8_t*)log, size, size*10 +100);
+    if (osKernelRunning()) {
+        osMutexWait(uart_mutex_id, osWaitForever);
+        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, size * 10 + 100);
+        osMutexRelease(uart_mutex_id);
+    } else {
+        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, size * 10 + 100);
+    }
+//    if (uart_mutex_id != NULL) {
+//        osMutexWait(uart_mutex_id, osWaitForever);
+//        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, HAL_MAX_DELAY);
+//        osMutexRelease(uart_mutex_id);
+//    } else {
+//        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, HAL_MAX_DELAY);
+//    }
 }
 
 /**
  * output lock
  */
 void elog_port_output_lock(void) {
-    
+
     /* add your code here */
-    
+
 }
 
 /**
  * output unlock
  */
 void elog_port_output_unlock(void) {
-    
+
     /* add your code here */
-    
+
 }
 
 /**
@@ -90,7 +107,7 @@ void elog_port_output_unlock(void) {
  * @return current time
  */
 const char *elog_port_get_time(void) {
-    
+
     /* add your code here */
     return "";
 }
@@ -101,7 +118,7 @@ const char *elog_port_get_time(void) {
  * @return current process name
  */
 const char *elog_port_get_p_info(void) {
-    
+
     /* add your code here */
     return "";
 }
@@ -112,8 +129,8 @@ const char *elog_port_get_p_info(void) {
  * @return current thread name
  */
 const char *elog_port_get_t_info(void) {
-    
+
     /* add your code here */
     return "";
-    
+
 }
