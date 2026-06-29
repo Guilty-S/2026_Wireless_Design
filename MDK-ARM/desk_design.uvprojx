@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../easylogger/inc;../user</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../easylogger/inc;../user;..\user\mem</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -531,6 +531,16 @@
               <FileName>dht11.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\user\dht11.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mem</GroupName>
+          <Files>
+            <File>
+              <FileName>tlsf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\mem\tlsf.c</FilePath>
             </File>
           </Files>
         </Group>

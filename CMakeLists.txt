@@ -58,6 +58,7 @@ include_directories(
         easylogger/inc
         easylogger/port
         user
+        user/mem
         MDK-ARM/RTE/CMSIS
         Clion_Lib/RTX/Inc
         Clion_Lib/RTX/SRC
@@ -73,6 +74,7 @@ file(GLOB_RECURSE SOURCES
         "easylogger/port/*.c"
         "user/*.c"
         "MDK-ARM/RTE/CMSIS/*.c"
+        "user/mem/*.c"
 )
 # 假设你的芯片是 STM32F1 (Cortex-M3)
 set(RTX_SOURCES

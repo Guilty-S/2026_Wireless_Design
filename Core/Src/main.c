@@ -28,6 +28,7 @@
 #include <string.h>
 #include "dht11.h"
 #include "cmsis_os.h"
+#include "dyn_mem.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -250,7 +251,18 @@ void collect_temphumi_timer_callback(void const *arg) {
     key1_last_state = key1_curr_state;
     key2_last_state = key2_curr_state;
 }
-
+void test_mem(){
+    uint8_t *pmem;
+    uint16_t i;
+    pmem=dm_alloc(1000);
+    if(pmem!=NULL){
+        for(i=0;i<1000;i++){
+            pmem[i]='A';
+        }
+    }
+    dm_free(pmem);
+    pmem=NULL;
+}
 /* USER CODE END 0 */
 
 /**
@@ -331,6 +343,8 @@ int main(void) {
     }
 //    osSignalSet(tid_led_showthread, 0x00000001);
 //    __set_PSP(__get_MSP());
+    dm_init();
+    test_mem();
     osKernelStart();
 
 //    HAL_StatusTypeDef result;
