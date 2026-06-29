@@ -29,6 +29,8 @@
 #include "dht11.h"
 #include "cmsis_os.h"
 #include "dyn_mem.h"
+#include "vMsgExec.h"
+#include "app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -308,43 +310,46 @@ int main(void) {
     elog_set_fmt(ELOG_LVL_DEBUG, ELOG_FMT_ALL & ~ELOG_FMT_FUNC);
     elog_set_fmt(ELOG_LVL_VERBOSE, ELOG_FMT_ALL & ~ELOG_FMT_FUNC);
     elog_start();
-    log_i("Wireless test start");
+    dm_init();
+//    test_mem();
+    MsgExec_Init();
+    VWM_TimerInit();
+    log_i("Wireless Access System Init OK!");
+    app_init();
 
     HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-
-    uart_mutex_id = osMutexCreate(osMutex(uart_mutex));
-
-    msgq_LEDShow_Thread_id = osMessageCreate(osMessageQ(msgq_LEDShow_Thread), NULL);
-    msgq_UART1_Send_Thread_id = osMessageCreate(osMessageQ(msgq_UART1_Send_Thread), NULL);
-
-//    htsensorvalue_uart1_q_id = osMailCreate(osMailQ(htsensorvalue_uart1_q), NULL);
-//    htsensorvalue_led_q_id = osMailCreate(osMailQ(htsensorvalue_led_q), NULL);
-
-    tid_led_show_thread = osThreadCreate(osThread (LEDShow_Thread), NULL);
-    tid_uart_send_thread = osThreadCreate(osThread (UART1_Send_Thread), NULL);
-    tid_temphumi_collect_thread = osThreadCreate(osThread(TempHumi_Collect_Thread), NULL);
-
-    collect_temphumi_timer_id = osTimerCreate(osTimer(collect_temphumi_timer), osTimerPeriodic, NULL);
-
-    if (tid_led_show_thread == NULL) {
-        log_e("LED_ERROR");
-    } else {
-        log_i("LED_SUCCESS");
-    }
-    if (tid_uart_send_thread == NULL) {
-        log_e("UART_ERROR");
-    } else {
-        log_i("UART_SUCCESS");
-    }
-    if (tid_temphumi_collect_thread == NULL) {
-        log_e("TH_ERROR");
-    } else {
-        log_i("TH_SUCCESS");
-    }
+//
+//    uart_mutex_id = osMutexCreate(osMutex(uart_mutex));
+//
+//    msgq_LEDShow_Thread_id = osMessageCreate(osMessageQ(msgq_LEDShow_Thread), NULL);
+//    msgq_UART1_Send_Thread_id = osMessageCreate(osMessageQ(msgq_UART1_Send_Thread), NULL);
+//
+////    htsensorvalue_uart1_q_id = osMailCreate(osMailQ(htsensorvalue_uart1_q), NULL);
+////    htsensorvalue_led_q_id = osMailCreate(osMailQ(htsensorvalue_led_q), NULL);
+//
+//    tid_led_show_thread = osThreadCreate(osThread (LEDShow_Thread), NULL);
+//    tid_uart_send_thread = osThreadCreate(osThread (UART1_Send_Thread), NULL);
+//    tid_temphumi_collect_thread = osThreadCreate(osThread(TempHumi_Collect_Thread), NULL);
+//
+//    collect_temphumi_timer_id = osTimerCreate(osTimer(collect_temphumi_timer), osTimerPeriodic, NULL);
+//
+//    if (tid_led_show_thread == NULL) {
+//        log_e("LED_ERROR");
+//    } else {
+//        log_i("LED_SUCCESS");
+//    }
+//    if (tid_uart_send_thread == NULL) {
+//        log_e("UART_ERROR");
+//    } else {
+//        log_i("UART_SUCCESS");
+//    }
+//    if (tid_temphumi_collect_thread == NULL) {
+//        log_e("TH_ERROR");
+//    } else {
+//        log_i("TH_SUCCESS");
+//    }
 //    osSignalSet(tid_led_showthread, 0x00000001);
 //    __set_PSP(__get_MSP());
-    dm_init();
-    test_mem();
     osKernelStart();
 
 //    HAL_StatusTypeDef result;
@@ -358,7 +363,7 @@ int main(void) {
     /* USER CODE BEGIN WHILE */
 //    osDelay(0xFFFFFFFF);
     while (1) {
-        osDelay(100);
+        MsgExec_Exec();
 //        if (key1_is_pressed) {
 //            HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
 //        } else {

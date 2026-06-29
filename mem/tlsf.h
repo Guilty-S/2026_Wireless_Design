@@ -31,7 +31,7 @@
 #include <stddef.h>
 
 //#define DM_MEM_SIZE    (4*1024+840) /*Size memory used by mem_alloc (in bytes)*/
-#define DM_MEM_SIZE    	 8*1024 /*Size memory used by mem_alloc (in bytes)*/
+#define DM_MEM_SIZE    	 6*1024 /*Size memory used by mem_alloc (in bytes)*/
 
 /**
  * Initiaize the dyn_mem module (work memory and other variables)

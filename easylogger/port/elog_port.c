@@ -67,13 +67,15 @@ void elog_port_output(const char *log, size_t size) {
 
     /* add your code here */
 //     printf("%.*s", size, log);
-    if (osKernelRunning()) {
-        osMutexWait(uart_mutex_id, osWaitForever);
-        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, size * 10 + 100);
-        osMutexRelease(uart_mutex_id);
-    } else {
-        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, size * 10 + 100);
-    }
+    HAL_UART_Transmit(&huart1, (uint8_t *) log, size, size * 10 + 100);
+
+//    if (osKernelRunning()) {
+//        osMutexWait(uart_mutex_id, osWaitForever);
+//        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, size * 10 + 100);
+//        osMutexRelease(uart_mutex_id);
+//    } else {
+//        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, size * 10 + 100);
+//    }
 //    if (uart_mutex_id != NULL) {
 //        osMutexWait(uart_mutex_id, osWaitForever);
 //        HAL_UART_Transmit(&huart1, (uint8_t *) log, size, HAL_MAX_DELAY);

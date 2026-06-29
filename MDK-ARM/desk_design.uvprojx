@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../easylogger/inc;../user;..\user\mem</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../easylogger/inc;../user;..\mem</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -532,6 +532,21 @@
               <FileType>1</FileType>
               <FilePath>..\user\dht11.c</FilePath>
             </File>
+            <File>
+              <FileName>app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\app.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\bsp.c</FilePath>
+            </File>
+            <File>
+              <FileName>vMsgExec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\vMsgExec.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -540,7 +555,7 @@
             <File>
               <FileName>tlsf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\user\mem\tlsf.c</FilePath>
+              <FilePath>..\mem\tlsf.c</FilePath>
             </File>
           </Files>
         </Group>
