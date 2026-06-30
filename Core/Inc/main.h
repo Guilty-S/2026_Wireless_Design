@@ -61,15 +61,24 @@ void Error_Handler(void);
 #define LED_GPIO_Port GPIOC
 #define KEY1_Pin GPIO_PIN_14
 #define KEY1_GPIO_Port GPIOC
-#define KEY1_EXTI_IRQn EXTI15_10_IRQn
 #define DHT11_IO_Pin GPIO_PIN_15
 #define DHT11_IO_GPIO_Port GPIOC
-#define KEY3_Pin GPIO_PIN_12
-#define KEY3_GPIO_Port GPIOB
-#define KEY3_EXTI_IRQn EXTI15_10_IRQn
+#define VRADIO_NSS_Pin GPIO_PIN_4
+#define VRADIO_NSS_GPIO_Port GPIOA
+#define VRADIO_RESET_Pin GPIO_PIN_10
+#define VRADIO_RESET_GPIO_Port GPIOB
+#define VRADIO_DIO_0_Pin GPIO_PIN_11
+#define VRADIO_DIO_0_GPIO_Port GPIOB
+#define VRADIO_DIO_0_EXTI_IRQn EXTI15_10_IRQn
+#define VRADIO_DIO_1_Pin GPIO_PIN_12
+#define VRADIO_DIO_1_GPIO_Port GPIOB
+#define VRADIO_DIO_1_EXTI_IRQn EXTI15_10_IRQn
 #define KEY2_Pin GPIO_PIN_13
 #define KEY2_GPIO_Port GPIOB
-#define KEY2_EXTI_IRQn EXTI15_10_IRQn
+#define KEY3_Pin GPIO_PIN_14
+#define KEY3_GPIO_Port GPIOB
+#define VRADIO_DIO_3_Pin GPIO_PIN_4
+#define VRADIO_DIO_3_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
