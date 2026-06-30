@@ -3,21 +3,20 @@
 #include "stm32f1xx_hal.h"
 #include <string.h>
 #include "main.h"
-
 #define KEY_COUNT 3
 #define KEY_QUDOU_MAXCOUNT 3
 
 typedef struct key_t {
-    GPIO_PinState     key_state; //按键的稳定状态 GPIO_PIN_RESET GPIO_PIN_SET
-    uint8_t           key_press_count; //按键状态计数
-    GPIO_TypeDef *    gpio_port;
-    uint16_t          gpio_Pin;
-    uint8_t           key_value;
+    GPIO_PinState       key_state; //按键的稳定状态 GPIO_PIN_RESET GPIO_PIN_SET
+    uint8_t             key_press_count; //按键状态计数
+    GPIO_TypeDef *      gpio_port;
+    uint16_t            gpio_Pin;
+    uint8_t             key_value;
 }key_t;
 
 typedef struct key_scan_t {
-    key_t                         key[KEY_COUNT];
-    key_change_callback_function_t key_scan_callback;
+    key_t                            key[KEY_COUNT];
+    key_change_callback_function_t   key_scan_callback;
 }key_scan_t;
 
 key_scan_t g_keyscan;
@@ -36,12 +35,13 @@ void key_init(key_change_callback_function_t kayscanfun)
     g_keyscan.key[1].key_value = KEY_2;
     g_keyscan.key[1].key_state = HAL_GPIO_ReadPin(g_keyscan.key[1].gpio_port, g_keyscan.key[1].gpio_Pin);
 
-//    g_keyscan.key[2].gpio_port = KEY3_GPIO_Port;
-//    g_keyscan.key[2].gpio_Pin = KEY3_Pin;
-//    g_keyscan.key[2].key_value = KEY_3;
-//    g_keyscan.key[2].key_state = HAL_GPIO_ReadPin(g_keyscan.key[2].gpio_port, g_keyscan.key[2].gpio_Pin);
+    g_keyscan.key[2].gpio_port = KEY3_GPIO_Port;
+    g_keyscan.key[2].gpio_Pin = KEY3_Pin;
+    g_keyscan.key[2].key_value = KEY_3;
+    g_keyscan.key[2].key_state = HAL_GPIO_ReadPin(g_keyscan.key[2].gpio_port, g_keyscan.key[2].gpio_Pin);
 
     g_keyscan.key_scan_callback = kayscanfun;
+
 }
 
 void key_scan(void)

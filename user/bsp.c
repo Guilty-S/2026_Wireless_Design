@@ -1,11 +1,18 @@
-//
-// Created by Administrator on 2026/6/29.
-//
 #include "bsp.h"
+#include "stm32f1xx_hal.h"
 #include "main.h"
 
-#include "stm32f1xx_hal.h"
+void led_on()
+{
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+}
 
-void LED_Toggle(){
-    HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
+void led_off()
+{
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+}
+
+void led_toggole()
+{
+    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 }

@@ -1,12 +1,11 @@
-//
-// Created by Administrator on 2026/6/24.
-//
-
-#ifndef DESK_DESIGN_BSP_H
-#define DESK_DESIGN_BSP_H
-
 #include "stm32f1xx_hal.h"
-void LED_Toggle();
+
 extern TIM_HandleTypeDef htim4;
+
 extern UART_HandleTypeDef huart1;
-#endif //DESK_DESIGN_BSP_H
+extern UART_HandleTypeDef huart2;
+
+void HAL_UART_IDLECallBack(UART_HandleTypeDef *huart);
+void led_on();
+void led_off();
+void led_toggole();

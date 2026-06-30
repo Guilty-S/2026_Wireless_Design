@@ -19,4 +19,5 @@ void key_init(key_change_callback_function_t kayscanfun);
 // 需要在10ms扫描函数调用
 void key_scan(void);
 
+
 #endif

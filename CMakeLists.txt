@@ -58,6 +58,7 @@ include_directories(
         easylogger/inc
         easylogger/port
         user
+        user/lcd
         mem
         MDK-ARM/RTE/CMSIS
         Clion_Lib/RTX/Inc
@@ -73,6 +74,7 @@ file(GLOB_RECURSE SOURCES
         "easylogger/src/*.c"
         "easylogger/port/*.c"
         "user/*.c"
+        "user/lcd/*.c"
         "MDK-ARM/RTE/CMSIS/*.c"
         "mem/*.c"
 )
