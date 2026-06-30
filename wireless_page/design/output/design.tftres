@@ -1,0 +1,10 @@
+<Resource>
+    <pages>
+        <page name="主界面" id="0" />
+    </pages>
+    <images>
+        <image id="0" url="d:\st\stm_project\desk_design\wireless_page\design\images\主界面.png" effect_width="480" effect_height="272" />
+        <image id="1" url="d:\st\stm_project\desk_design\wireless_page\design\images\主界面按键按下.png" effect_width="480" effect_height="311" />
+    </images>
+    <waves />
+</Resource>
